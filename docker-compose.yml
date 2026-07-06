@@ -1,0 +1,22 @@
+# Local development database only. Production/Unraid deployment compose
+# is a documented follow-up (see docs/) and intentionally not built yet.
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: budget_tracker
+      POSTGRES_PASSWORD: budget_tracker_dev
+      POSTGRES_DB: budget_tracker
+    ports:
+      - "5432:5432"
+    volumes:
+      - budget_tracker_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U budget_tracker -d budget_tracker"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  budget_tracker_db_data:

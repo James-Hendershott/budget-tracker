@@ -1,0 +1,545 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>BUILD_LOG.md</title>
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #0e0e10;
+    --surface: #161618;
+    --border: #2a2a2e;
+    --fg: #eaeaea;
+    --muted: #8d8d94;
+    --accent: #6c8cff;
+    --code-bg: #1a1a1d;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; height: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  .shell {
+    display: grid;
+    grid-template-columns: 290px 1fr;
+    min-height: 100vh;
+  }
+  @media (max-width: 900px) {
+    .shell { grid-template-columns: 1fr; }
+    .sidebar { position: static !important; height: auto !important; max-height: none !important; border-right: 0; border-bottom: 1px solid var(--border); }
+  }
+  .sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    max-height: 100vh;
+    overflow-y: auto;
+    padding: 1.5rem 1.25rem 2rem;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    font-size: 0.88rem;
+  }
+  .sidebar h1 { margin: 0 0 0.3rem; font-size: 1.05rem; color: var(--fg); }
+  .sidebar .subtitle { margin: 0 0 1.4rem; font-size: 0.78rem; color: var(--muted); }
+  .sidebar input[type="search"] {
+    width: 100%;
+    padding: 0.4rem 0.55rem;
+    margin-bottom: 0.9rem;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--code-bg);
+    color: var(--fg);
+    font-size: 0.85rem;
+  }
+  .toc { display: flex; flex-direction: column; gap: 0.15rem; }
+  .toc a {
+    color: var(--muted);
+    text-decoration: none;
+    padding: 0.25rem 0.35rem;
+    border-radius: 3px;
+    border-left: 2px solid transparent;
+    transition: background 0.08s, color 0.08s;
+  }
+  .toc a:hover { color: var(--fg); background: rgba(108, 140, 255, 0.08); }
+  .toc a.active { color: var(--fg); border-left-color: var(--accent); background: rgba(108, 140, 255, 0.12); }
+  .toc a.toc-l2 { padding-left: 0.35rem; font-weight: 600; }
+  .toc a.toc-l3 { padding-left: 1rem; font-weight: 400; color: var(--muted); }
+  .toc a.hidden { display: none; }
+
+  .content { padding: 2.5rem 3rem 5rem; max-width: 920px; width: 100%; }
+  @media (max-width: 900px) { .content { padding: 1.5rem 1.25rem 3rem; } }
+
+  h1 { font-size: 1.85rem; line-height: 1.2; margin: 2.5rem 0 0.8rem; }
+  h1:first-child { margin-top: 0; }
+  h2 { font-size: 1.4rem; line-height: 1.25; margin: 2.3rem 0 0.7rem; padding-bottom: 0.35rem; border-bottom: 1px solid var(--border); }
+  h3 { font-size: 1.12rem; line-height: 1.3; margin: 1.7rem 0 0.5rem; }
+  h4 { font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin: 1.3rem 0 0.4rem; }
+  h1, h2, h3, h4 { scroll-margin-top: 1rem; }
+
+  p { margin: 0 0 1rem; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  ul, ol { margin: 0 0 1rem; padding-left: 1.4rem; }
+  ul li, ol li { margin-bottom: 0.25rem; }
+  hr { border: 0; border-top: 1px solid var(--border); margin: 2rem 0; }
+
+  code {
+    font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+    font-size: 0.88em;
+    padding: 0.1em 0.35em;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 0.9rem 1rem;
+    overflow-x: auto;
+    line-height: 1.55;
+    font-size: 0.87rem;
+    margin: 0 0 1rem;
+  }
+  pre code { padding: 0; border: 0; background: transparent; font-size: inherit; }
+
+  blockquote {
+    margin: 0 0 1rem;
+    padding: 0.35rem 1rem;
+    border-left: 3px solid var(--accent);
+    background: rgba(108, 140, 255, 0.06);
+    color: var(--fg);
+  }
+  blockquote p { margin: 0.3rem 0; }
+
+  table { border-collapse: collapse; width: 100%; margin: 0 0 1rem; font-size: 0.9rem; }
+  table th, table td { border: 1px solid var(--border); padding: 0.4rem 0.65rem; text-align: left; vertical-align: top; }
+  table th { background: var(--code-bg); font-weight: 600; }
+  table tr:nth-child(even) td { background: rgba(255, 255, 255, 0.02); }
+
+  strong { color: var(--fg); font-weight: 700; }
+  em { color: #dcdce2; }
+
+  .foot {
+    margin-top: 3rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.78rem;
+  }
+  .foot code { font-size: 0.82rem; }
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar">
+    <h1>BUILD_LOG.md</h1>
+    <p class="subtitle">teach-as-you-build wiki</p>
+    <input id="search" type="search" placeholder="Filter sections…" autocomplete="off" />
+    <nav class="toc" id="toc">
+        <a class="toc-l2" href="#how-to-read-this">How to read this</a>
+        <a class="toc-l2" href="#table-of-contents">Table of contents</a>
+        <a class="toc-l2" href="#the-ask">The ask</a>
+        <a class="toc-l2" href="#whats-the-actual-problem">What&amp;#39;s the actual problem</a>
+        <a class="toc-l2" href="#researching-prior-art">Researching prior art</a>
+        <a class="toc-l2" href="#the-design-that-fell-out">The design that fell out</a>
+        <a class="toc-l2" href="#chapter-takeaways">Chapter takeaways</a>
+        <a class="toc-l2" href="#the-ask-2">The ask</a>
+        <a class="toc-l2" href="#the-plan">The plan</a>
+        <a class="toc-l2" href="#step-1-scaffolding-and-the-version-drift-problem">Step 1: Scaffolding and the version-drift problem</a>
+        <a class="toc-l2" href="#step-2-prismas-driver-adapter-architecture">Step 2: Prisma&amp;#39;s driver-adapter architecture</a>
+        <a class="toc-l2" href="#step-3-unknowns-are-data-not-zeros">Step 3: Unknowns are data, not zeros</a>
+        <a class="toc-l2" href="#step-4-splitting-auth-config-for-the-edge-runtime">Step 4: Splitting auth config for the Edge runtime</a>
+        <a class="toc-l2" href="#step-5-argon2id-over-bcrypt-and-a-self-hosted-lockout">Step 5: Argon2id over bcrypt, and a self-hosted lockout</a>
+        <a class="toc-l2" href="#bugs-we-hit">Bugs we hit</a>
+        <a class="toc-l2" href="#verifying">Verifying</a>
+        <a class="toc-l2" href="#chapter-takeaways-2">Chapter takeaways</a>
+    </nav>
+  </aside>
+  <main class="content" id="content">
+    <h1 id="build_logmd-how-family-budget-tracker-got-built-step-by-step">BUILD_LOG.md — How Family Budget Tracker Got Built, Step by Step</h1>
+<p>A chronological build log. Each chapter covers one version (one commit
+in the project&#39;s git history) and walks through what we built, the
+decisions we made, the syntax and patterns we used, and any bugs we
+hit along the way.</p>
+<p><strong>Audience:</strong> someone with little or no experience who wants to learn
+how a real software project actually comes together. Read top to
+bottom — each chapter assumes you&#39;ve read the ones before it.</p>
+<p><strong>Companion document:</strong> <a href="LEARN.md"><code>LEARN.md</code></a> is the topical reference
+(&quot;here&#39;s how to think about X&quot;). This document is the narrative
+(&quot;here&#39;s exactly what we did and why, in order&quot;).</p>
+<hr>
+<h2 id="how-to-read-this">How to read this</h2>
+<ol>
+<li><strong>Read sequentially.</strong> Skipping chapters means missing context.</li>
+<li><strong>Open the files alongside.</strong> Path references are real — open them
+in your editor while you read.</li>
+<li><strong>Try the commands yourself.</strong> Code blocks marked <code>bash</code> are
+commands you can run.</li>
+<li><strong>It&#39;s OK to not understand everything on first pass.</strong> Some
+concepts are introduced briefly here and unpacked further in
+<code>LEARN.md</code>. Use the cross-references.</li>
+<li><strong>Glossary at the end.</strong> Anytime a term appears in <strong>bold italic</strong>,
+it&#39;s defined in the glossary.</li>
+</ol>
+<hr>
+<h2 id="table-of-contents">Table of contents</h2>
+<ul>
+<li><a href="#chapter-0--before-any-code-understanding-the-ask">Chapter 0 — Before any code: understanding the ask</a></li>
+<li><a href="#chapter-1--v010-scaffolding-the-mvp">Chapter 1 — v0.1.0: Scaffolding the MVP</a></li>
+<li>(Append chapters as the project grows)</li>
+</ul>
+<hr>
+<h1 id="chapter-0-before-any-code-understanding-the-ask">Chapter 0 — Before any code: understanding the ask</h1>
+<h2 id="the-ask">The ask</h2>
+<p>James and his wife Savanah have been trying to manage their household
+budget by hand, and it&#39;s been hard to keep everything captured and
+organized — what&#39;s required each month, what&#39;s already been paid, and
+what has to be covered before the next paycheck. James asked for a
+private, self-hosted &quot;family survival-budget tracker&quot;: not a generic
+budgeting app, but something whose first job is answering <em>&quot;are we
+okay this month, and safe until the next paycheck?&quot;</em></p>
+<p>The real numbers already existed as planning notes in an Obsidian
+vault (<code>tracked_debt_summary.md</code>, <code>debt_consolidation_plan_summary.md</code>)
+— fifteen-plus real debts, a Prosper consolidation loan offer, medical
+payment plans, and a list of what&#39;s still unknown (the loan servicer&#39;s balance,
+a couple of unconfirmed Amazon installment balances). That vault is
+the requirements source for this app; see
+<a href="docs/PLANNING_SOURCES.md"><code>docs/PLANNING_SOURCES.md</code></a>.</p>
+<h2 id="whats-the-actual-problem">What&#39;s the actual problem</h2>
+<p>Beyond &quot;track the budget,&quot; the real problem was <strong>visibility under
+stress</strong>. Debts were scattered across cards, payment plans, and BNPL
+installments with different due dates and partial information. The
+household needed one place that could say, truthfully, what&#39;s still
+owed, what&#39;s unknown and needs confirming, and what&#39;s safe to spend —
+without hiding the gaps in the data behind fake zeros.</p>
+<p>Explicitly out of scope for the MVP: bank sync, Plaid, any external
+financial API, and automatic Google Sheets sync. This is a
+privacy-first tool by design.</p>
+<h2 id="researching-prior-art">Researching prior art</h2>
+<p>James has built several personal apps before (an inventory PWA, a
+family task-tracking app, a property-comparison tool), each with its
+own stack choices. Rather than copy those choices by default, James
+asked explicitly for <strong>current, real-world professional conventions</strong>
+— he&#39;s still learning to code and wanted the reasoning to hold up on
+its own, not &quot;because that&#39;s what I did last time.&quot; Every stack choice
+in this project is justified independently in
+<a href="README.md#tech-stack"><code>README.md</code></a> and the approved implementation
+plan, not inherited.</p>
+<h2 id="the-design-that-fell-out">The design that fell out</h2>
+<ul>
+<li><strong>Next.js 14 (App Router) + TypeScript</strong>, Server Components and
+Server Actions as the default data flow — no separate REST API layer
+for a single-app, two-user product.</li>
+<li><strong>PostgreSQL + Prisma</strong> for the data model, chosen for typed queries
+and a real migration history over a hand-rolled query layer.</li>
+<li><strong>NextAuth v5 (Auth.js) + Argon2id</strong>, not hand-rolled auth — a
+finance app is exactly the kind of thing where a subtly wrong
+session-cookie or CSRF implementation is expensive to get wrong.</li>
+<li><strong>Tailwind CSS v4 + shadcn/ui</strong> for styling — components you own the
+source of, built on accessible Radix primitives.</li>
+<li><strong>Docker (local dev now, Unraid production later)</strong> — self-hosted,
+no cloud dependency, matching the privacy-first requirement.</li>
+<li>Every &quot;syncable&quot; data model (debts, bills, transactions, etc.) got
+<code>source</code>/<code>externalId</code>/<code>updatedAt</code> fields from day one, even though
+Google Sheets sync isn&#39;t built yet — see Chapter 1&#39;s &quot;unknowns are
+data, not zeros&quot; section for why this mattered immediately, not
+hypothetically.</li>
+</ul>
+<h2 id="chapter-takeaways">Chapter takeaways</h2>
+<ul>
+<li>A good first step for any app handling someone&#39;s real, messy data is
+asking &quot;what do we know, what don&#39;t we know, and how do we represent
+&#39;don&#39;t know&#39; honestly?&quot; — this shaped the schema before a single
+page was built.</li>
+<li>Stack choices should be defensible on their own merits. If you can&#39;t
+explain <em>why</em> a library beats the alternative, that&#39;s a sign to
+research before choosing, not after.</li>
+</ul>
+<hr>
+<h1 id="chapter-1-v010-scaffolding-the-mvp">Chapter 1 — v0.1.0: Scaffolding the MVP</h1>
+<blockquote>
+<p>📌 <strong>What this chapter teaches.</strong> Next.js App Router project
+structure, Prisma&#39;s newer driver-adapter architecture, why
+middleware and auth logic sometimes need to be split in two files,
+Tailwind v4&#39;s CSS-first theming, and Argon2id password hashing.</p>
+</blockquote>
+<h2 id="the-ask-2">The ask</h2>
+<p>Build the actual project scaffolding: a Next.js app, the full
+database schema, a page for every MVP feature (dashboard, income,
+bills, housing, transactions, debts, goals, what-if scenarios, admin),
+seeded with the household&#39;s real debt data, with working
+authentication — not a bare &quot;hello world,&quot; a working first cut.</p>
+<h2 id="the-plan">The plan</h2>
+<p>Follow the approved implementation plan step by step: scaffold the
+Next.js app, wire up Prisma against a local Docker Postgres, add
+NextAuth with Argon2id, write Zod validation for every domain model,
+build the page structure, add a PWA manifest/service worker, and set
+up Vitest + a Playwright smoke test + CI.</p>
+<h2 id="step-1-scaffolding-and-the-version-drift-problem">Step 1: Scaffolding and the version-drift problem</h2>
+<p><code>create-next-app@14</code> and <code>npx shadcn@latest init</code> were run back to
+back, expecting them to agree on tooling versions. They didn&#39;t: the
+Next.js template installed <strong>Tailwind v3</strong>, but the <em>current</em> shadcn
+CLI (<code>shadcn@4.13.0</code>) generates CSS built for <strong>Tailwind v4</strong> (CSS-first
+<code>@theme</code> blocks instead of a <code>tailwind.config.ts</code> content-scanning
+setup). The build failed with <code>Cannot apply unknown utility class &#39;border-border&#39;</code> — a real symptom of &quot;two tools that assume different
+major versions of a third tool.&quot;</p>
+<p>The fix was to upgrade to Tailwind v4 rather than fight the v3 config
+into shape, since v4 is what the current tooling actually targets:</p>
+<pre><code class="language-bash">npm install tailwindcss@latest @tailwindcss/postcss@latest
+</code></pre>
+<pre><code class="language-css">/* src/app/globals.css — v4 uses a single import, not three @tailwind directives */
+@import &quot;tailwindcss&quot;;
+@import &quot;tw-animate-css&quot;;
+@import &quot;shadcn/tailwind.css&quot;;
+</code></pre>
+<p>Even after that, the CLI&#39;s generated <code>globals.css</code> was still missing
+the <code>@theme inline</code> block that maps custom properties like <code>--border</code>
+to the actual utility class <code>border-border</code>. That block had to be
+added by hand (see <code>src/app/globals.css</code>) — the CLI defined the <em>color
+values</em> but not the <em>theme mapping</em> connecting them to Tailwind&#39;s
+utility generator. <strong>Lesson:</strong> when a generator produces &quot;almost
+working&quot; output, read the error literally — &quot;unknown utility class&quot;
+meant a mapping was missing, not that the color was wrong.</p>
+<h2 id="step-2-prismas-driver-adapter-architecture">Step 2: Prisma&#39;s driver-adapter architecture</h2>
+<p><code>npm install prisma</code> pulled Prisma 7, whose <code>schema.prisma</code> no longer
+accepts a <code>url</code> directly in the <code>datasource</code> block — that&#39;s now
+Prisma-config-only, and the running app must pass a <strong>driver adapter</strong>
+(<code>@prisma/adapter-pg</code>) into <code>PrismaClient</code> explicitly:</p>
+<pre><code class="language-ts">// src/lib/prisma.ts
+const adapter = new PrismaPg({ connectionString: env.DATABASE_URL });
+export const prisma = new PrismaClient({ adapter });
+</code></pre>
+<p>This matters because it decouples <em>which</em> database driver runs your
+queries from Prisma&#39;s query engine — useful for edge/serverless
+deployments that need a different connection strategy, though this app
+just uses the standard Node <code>pg</code> driver.</p>
+<p>Prisma also refuses to run <code>migrate dev</code> in a <strong>non-interactive</strong>
+shell at all (no bypass flag) — it&#39;s designed to prompt a human. The
+workaround: generate the SQL diff with <code>prisma migrate diff --script</code>
+into a scratch file first, review it, then hand-write it into a
+<code>prisma/migrations/&lt;timestamp&gt;_&lt;name&gt;/migration.sql</code> folder and apply
+with <code>prisma migrate deploy</code>, which <em>is</em> safe to run unattended. This
+needed a <strong>shadow database</strong> (a scratch Postgres database Prisma uses
+to compute the diff) — created with one <code>CREATE DATABASE</code> statement
+and pointed to via <code>SHADOW_DATABASE_URL</code> in <code>prisma.config.ts</code>.</p>
+<h2 id="step-3-unknowns-are-data-not-zeros">Step 3: Unknowns are data, not zeros</h2>
+<p>The real debt tracker has entries like the loan servicer&#39;s student loan (payment
+known, balance and APR genuinely unknown) and one Amazon installment
+plan where <em>neither</em> the balance nor the payment is confirmed. The
+schema&#39;s first draft made <code>Debt.balance</code> and <code>Debt.minimumPayment</code>
+required — which would have forced seeding fake <code>$0</code> values, silently
+lying about the household&#39;s real exposure.</p>
+<p>Fixed by making both fields nullable, with the UI rendering an
+&quot;Unknown&quot; badge instead of <code>$0.00</code> (see <code>src/app/(app)/debts/page.tsx</code>).
+<strong>Lesson:</strong> &quot;we don&#39;t know yet&quot; is a real, distinct state from &quot;zero&quot;
+— modeling it honestly costs one <code>?</code> in the schema and pays for itself
+the first time someone almost trusts a wrong number.</p>
+<h2 id="step-4-splitting-auth-config-for-the-edge-runtime">Step 4: Splitting auth config for the Edge runtime</h2>
+<p>Next.js <strong>always</strong> runs <code>middleware.ts</code> on the Edge runtime — there&#39;s
+no opt-out in Next 14. The Edge runtime can&#39;t load <code>argon2</code> (native
+Node bindings) or the Postgres driver Prisma&#39;s adapter needs. Writing
+the full NextAuth config (Credentials provider, Prisma lookups, argon2
+verification) directly into a file imported by <code>middleware.ts</code> would
+have shipped code that crashes the moment the app tries to run it at
+the edge.</p>
+<p>The fix, and the standard Auth.js pattern for this exact problem: split
+the config in two.</p>
+<ul>
+<li><code>src/auth.config.ts</code> — Edge-safe. Only the <code>pages</code> config and an
+<code>authorized()</code> callback that reads the already-decoded session and
+decides redirect/allow. No Prisma, no argon2, no providers.</li>
+<li><code>src/auth.ts</code> — full config, Credentials provider, Prisma lookups,
+Argon2id verification. Only ever imported from Node-runtime code
+(Server Components, Server Actions, the <code>/api/auth</code> route handler).</li>
+<li><code>middleware.ts</code> builds its <code>NextAuth(...)</code> instance from
+<code>auth.config.ts</code> alone.</li>
+</ul>
+<p><strong>Lesson:</strong> &quot;where does this code run&quot; is not a detail — Next.js has
+(at least) two different JavaScript runtimes in the same app, with
+different capabilities, and a middleware file silently pulling in the
+wrong dependency graph is a real, easy-to-hit failure mode.</p>
+<h2 id="step-5-argon2id-over-bcrypt-and-a-self-hosted-lockout">Step 5: Argon2id over bcrypt, and a self-hosted lockout</h2>
+<p>Password hashing used <strong>Argon2id</strong> rather than the more commonly-seen
+bcrypt — it&#39;s OWASP&#39;s current first recommendation for new
+applications. Failed logins are tracked directly on the <code>User</code> row
+(<code>failedLoginAttempts</code>, <code>lockedUntil</code>) rather than reaching for an
+external rate-limiting service, since this is a self-hosted app with
+no external dependencies by design:</p>
+<pre><code class="language-ts">if (!passwordValid) {
+  const failedLoginAttempts = user.failedLoginAttempts + 1;
+  const lockingOut = failedLoginAttempts &gt;= MAX_FAILED_ATTEMPTS;
+  await prisma.user.update({
+    where: { id: user.id },
+    data: {
+      failedLoginAttempts: lockingOut ? 0 : failedLoginAttempts,
+      lockedUntil: lockingOut ? new Date(Date.now() + LOCKOUT_MINUTES * 60_000) : null,
+    },
+  });
+  return null;
+}
+</code></pre>
+<h2 id="bugs-we-hit">Bugs we hit</h2>
+<ul>
+<li><strong><code>next/font/google</code> didn&#39;t recognize <code>Geist</code></strong> in this Next.js
+version. Fixed by using Vercel&#39;s official <code>geist</code> npm package
+(<code>geist/font/sans</code>) instead of <code>next/font/google</code>, which is the more
+current, version-independent way to use that font anyway.</li>
+<li><strong>Two competing font declarations</strong>: the create-next-app template
+had already wired up local Geist <code>.woff</code> files that the shadcn CLI&#39;s
+Google-font import silently duplicated. Removed the unused local
+font files and settled on one source of truth.</li>
+<li><strong>Playwright&#39;s first assertion failed</strong> on a cold dev server — Next
+dev mode compiles a route on its <em>first</em> request, and that took
+longer than Playwright&#39;s default 5-second assertion timeout. Not an
+app bug; fixed by bumping <code>expect.timeout</code> in <code>playwright.config.ts</code>
+to 10s, since this test is meant to run against whatever server is
+already up (dev&#39;s on-demand compilation included).</li>
+<li><strong>The seed script printed a password that didn&#39;t match what was
+actually stored</strong>, on the second and later runs. <code>prisma.user.upsert</code>
+was written with <code>update: {}</code> — correct, since it should never
+silently reset an existing user&#39;s real password — but the <em>console
+message</em> generated a fresh random password and printed it
+unconditionally, regardless of whether the upsert took the create or
+update path. Re-running <code>npm run db:seed</code> after the first real seed
+would print a brand-new &quot;temp password&quot; that was never actually
+hashed into the database. Caught during the final verification pass
+by re-seeding and noticing the printed password no longer matched a
+known-working login. Fixed by checking for an existing user with
+<code>findUnique</code> <em>before</em> generating/hashing/printing a password at all
+— see <code>upsertUserWithPassword()</code> in <code>prisma/seed.ts</code>. <strong>Lesson:</strong> a
+script that&#39;s safe to re-run (idempotent) isn&#39;t the same as a script
+whose <em>output</em> stays truthful on every re-run — check both, and
+verify by actually re-running it, not just reading the logic.</li>
+</ul>
+<h2 id="verifying">Verifying</h2>
+<ul>
+<li><code>npm run build</code> — clean production build, all routes correctly
+marked dynamic (server-rendered per request, since they read the
+session and query Prisma) rather than statically prerendered.</li>
+<li><code>npm run lint</code> / <code>npm run typecheck</code> / <code>npm run test</code> — all clean.</li>
+<li>Logged in as the real seeded James account via <code>curl</code> against the
+NextAuth credentials callback, confirmed the session JWT carried the
+right role/person, confirmed <code>/</code>, <code>/debts</code>, <code>/bills</code> render real
+seeded data, and confirmed the lockout actually triggers after 5 bad
+passwords and blocks even the <em>correct</em> password until it expires.</li>
+<li>Playwright smoke test (<code>e2e/login.spec.ts</code>) passes: login → redirect
+to dashboard → core sections visible; unauthenticated visit to
+<code>/bills</code> redirects to <code>/login</code>.</li>
+</ul>
+<h2 id="chapter-takeaways-2">Chapter takeaways</h2>
+<ul>
+<li>When two tools disagree on a dependency&#39;s major version, resolve the
+disagreement explicitly (upgrade or pin) rather than patching around
+the symptom — the symptom will resurface elsewhere.</li>
+<li>A field being &quot;required&quot; in a schema is a claim about the world. If
+the real world sometimes doesn&#39;t have that data, the schema should
+say so with <code>?</code>, not force a placeholder value that looks like data.</li>
+<li>Middleware in Next.js runs somewhere more restricted than the rest
+of your app — check what it can and can&#39;t import before your auth
+logic ends up there by accident.</li>
+<li>Picking the <em>current</em> recommended security primitive (Argon2id) is
+as easy as picking last decade&#39;s (bcrypt) — the only cost is
+spending five minutes checking what&#39;s current.</li>
+<li>&quot;Safe to re-run&quot; and &quot;truthful on every re-run&quot; are different
+properties — a script can correctly avoid overwriting data while its
+<em>logging</em> still lies about what happened. Verify a script by
+actually running it twice, not by reading its logic once.</li>
+</ul>
+<hr>
+<h1 id="how-future-chapters-will-get-added">How future chapters will get added</h1>
+<p>Going forward, every commit that adds a feature, fixes a bug, or makes
+a notable change gets a new chapter appended here. The chapter format:</p>
+<pre><code class="language-markdown"># Chapter N — vX.Y.Z: [Title]
+
+&gt; 📌 **What this chapter teaches.** [Concepts/syntax newly introduced]
+
+## The ask
+## The plan
+## Step 1: [Thing]
+## Step 2: [Thing]
+## Bugs we hit (if any)
+## Verifying
+## Chapter takeaways
+</code></pre>
+<hr>
+<h1 id="glossary">Glossary</h1>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Server Action</strong></td>
+<td>A Next.js function marked <code>&quot;use server&quot;</code> that runs only on the server but can be called directly from a form or client component, without hand-writing an API route.</td>
+</tr>
+<tr>
+<td><strong>Server Component</strong></td>
+<td>A React component that renders on the server and can <code>await</code> data (e.g. a Prisma query) directly in its body — the App Router default.</td>
+</tr>
+<tr>
+<td><strong>Driver adapter</strong></td>
+<td>Prisma&#39;s mechanism for plugging in a specific database driver (e.g. <code>@prisma/adapter-pg</code> for <code>pg</code>) instead of Prisma&#39;s built-in query engine binary talking to the DB itself.</td>
+</tr>
+<tr>
+<td><strong>Edge runtime</strong></td>
+<td>A restricted JavaScript runtime (used by Next.js middleware) that doesn&#39;t support native Node modules like <code>argon2</code> or many Node built-ins.</td>
+</tr>
+<tr>
+<td><strong>Argon2id</strong></td>
+<td>A password-hashing algorithm; OWASP&#39;s current top recommendation, designed to resist both GPU-cracking and side-channel attacks better than older algorithms like bcrypt.</td>
+</tr>
+<tr>
+<td><strong>Shadow database</strong></td>
+<td>A scratch database Prisma uses internally to compute the SQL difference between your current schema and your migration history — never touched by the running app.</td>
+</tr>
+</tbody></table>
+<hr>
+<p><em>This is a living document. Each release adds a chapter.</em></p>
+
+    <div class="foot">
+      <code>BUILD_LOG.md</code> wiki · 17 sections. Regenerate with <code>npm run build:wiki</code>.
+    </div>
+  </main>
+</div>
+<script>
+  (function () {
+    const search = document.getElementById('search')
+    const tocLinks = Array.from(document.querySelectorAll('#toc a'))
+
+    if (search) {
+      search.addEventListener('input', function () {
+        const q = search.value.trim().toLowerCase()
+        tocLinks.forEach(function (a) {
+          const match = !q || a.textContent.toLowerCase().includes(q)
+          a.classList.toggle('hidden', !match)
+        })
+      })
+    }
+
+    const headingEls = tocLinks
+      .map(function (a) { return document.querySelector(a.getAttribute('href')) })
+      .filter(Boolean)
+
+    function updateActive() {
+      const y = window.scrollY + 80
+      let activeIdx = 0
+      for (let i = 0; i < headingEls.length; i++) {
+        if (headingEls[i].offsetTop <= y) activeIdx = i
+      }
+      tocLinks.forEach(function (a, i) { a.classList.toggle('active', i === activeIdx) })
+    }
+    window.addEventListener('scroll', updateActive, { passive: true })
+    updateActive()
+  })()
+</script>
+</body>
+</html>

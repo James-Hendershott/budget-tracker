@@ -1,0 +1,303 @@
+// Family Budget Tracker — data model.
+// See D:\James_Journey\projects\active\budget-tracker (Obsidian vault) for
+// the requirements this schema is built from, and docs/PLANNING_SOURCES.md
+// for how the two relate.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+enum Person {
+  JAMES
+  SAVANAH
+}
+
+enum Owner {
+  JAMES
+  SAVANAH
+  EITHER
+  TOGETHER
+}
+
+enum Priority {
+  REQUIRED
+  IMPORTANT
+  REVIEW
+  OPTIONAL
+}
+
+enum BillStatus {
+  PLANNED
+  PENDING
+  PAID
+  REVIEW
+  SKIPPED
+}
+
+enum BillCategory {
+  HOUSING
+  UTILITIES
+  INSURANCE
+  INTERNET
+  SUBSCRIPTION
+  MEDICAL
+  PRESCRIPTION
+  STUDENT_LOAN
+  PERSONAL_LOAN
+  CREDIT_CARD
+  GROCERIES
+  GAS
+  ONE_TIME
+  OTHER
+}
+
+enum HousingLineItem {
+  RENT
+  MTM_FEE
+  WATER
+  SEWER
+  GAS
+  ELECTRIC
+  FEES
+  OTHER
+}
+
+enum DebtType {
+  CREDIT_CARD
+  INSTALLMENT
+  SIGNATURE_LOAN
+  STUDENT_LOAN
+  MEDICAL_PLAN
+  OTHER
+}
+
+enum DebtStrategy {
+  MINIMUM_ONLY
+  AVALANCHE
+  SNOWBALL
+  CONSOLIDATION_CANDIDATE
+  HOLD
+}
+
+enum GoalType {
+  MOVE_FUND
+  DOWN_PAYMENT
+  EMERGENCY_FUND
+  HSA_FSA
+  DEBT_PAYOFF
+}
+
+/// APP = created/edited in this app. SHEET = imported from the future
+/// Google Sheets companion. See docs/GOOGLE_SHEETS_COMPANION.md.
+enum SyncSource {
+  APP
+  SHEET
+}
+
+model User {
+  id                  String    @id @default(cuid())
+  email               String    @unique
+  name                Person
+  passwordHash        String
+  role                Role      @default(ADMIN)
+  failedLoginAttempts Int       @default(0)
+  lockedUntil         DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  @@map("users")
+}
+
+/// A recurring bill's template — "Rent is due the 1st, ~$1400, autopay off".
+/// Each month gets a BillInstance generated from this so history is
+/// preserved even if the template later changes.
+model RecurringBill {
+  id            String         @id @default(cuid())
+  name          String         @unique
+  category      BillCategory
+  priority      Priority
+  defaultAmount Decimal        @db.Decimal(10, 2)
+  dueDay        Int
+  autopay       Boolean        @default(false)
+  owner         Owner
+  active        Boolean        @default(true)
+  notes         String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  instances     BillInstance[]
+
+  @@map("recurring_bills")
+}
+
+/// One row per bill per month. This is what the dashboard reads to compute
+/// "what's still required this month." recurringBillId is nullable so
+/// one-time required expenses fit the same table without a template.
+model BillInstance {
+  id              String         @id @default(cuid())
+  recurringBillId String?
+  recurringBill   RecurringBill? @relation(fields: [recurringBillId], references: [id])
+  month           DateTime
+  name            String
+  category        BillCategory
+  priority        Priority
+  plannedAmount   Decimal        @db.Decimal(10, 2)
+  actualAmount    Decimal?       @db.Decimal(10, 2)
+  dueDay          Int
+  autopay         Boolean
+  owner           Owner
+  status          BillStatus     @default(PLANNED)
+  notes           String?
+  source          SyncSource     @default(APP)
+  externalId      String?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([month])
+  @@map("bill_instances")
+}
+
+/// The monthly rent/utilities target that can be paid off in pieces.
+model HousingTarget {
+  id           String           @id @default(cuid())
+  month        DateTime
+  targetAmount Decimal          @db.Decimal(10, 2)
+  notes        String?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  payments     HousingPayment[]
+
+  @@unique([month])
+  @@map("housing_targets")
+}
+
+model HousingPayment {
+  id              String          @id @default(cuid())
+  housingTargetId String
+  housingTarget   HousingTarget   @relation(fields: [housingTargetId], references: [id], onDelete: Cascade)
+  paymentDate     DateTime
+  amountPaid      Decimal         @db.Decimal(10, 2)
+  paidBy          Person
+  appliedTo       HousingLineItem
+  notes           String?
+  source          SyncSource      @default(APP)
+  externalId      String?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@map("housing_payments")
+}
+
+model IncomeEntry {
+  id             String     @id @default(cuid())
+  person         Person
+  expectedAmount Decimal    @db.Decimal(10, 2)
+  actualAmount   Decimal?   @db.Decimal(10, 2)
+  payDate        DateTime
+  purpose        String?
+  notes          String?
+  source         SyncSource @default(APP)
+  externalId     String?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  @@index([payDate])
+  @@map("income_entries")
+}
+
+model Transaction {
+  id                 String     @id @default(cuid())
+  date               DateTime
+  amount             Decimal    @db.Decimal(10, 2)
+  category           String
+  merchant           String?
+  paidBy             Person
+  paymentMethod      String?
+  countsTowardBudget Boolean    @default(true)
+  notes              String?
+  source             SyncSource @default(APP)
+  externalId         String?
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+
+  @@index([date])
+  @@map("transactions")
+}
+
+/// balance and minimumPayment are nullable on purpose: several real debts
+/// in the household's tracker genuinely have unknown balances or payments
+/// pending confirmation. Modeling that as "unknown" (not $0) is the whole
+/// point of the "unknown/incomplete debts" tracking requirement — the UI
+/// must flag these for review rather than silently treating them as zero.
+model Debt {
+  id                  String       @id @default(cuid())
+  name                String
+  lender              String
+  debtType            DebtType
+  balance             Decimal?     @db.Decimal(10, 2)
+  payoffAmount        Decimal?     @db.Decimal(10, 2)
+  apr                 Decimal?     @db.Decimal(5, 2)
+  minimumPayment      Decimal?     @db.Decimal(10, 2)
+  dueDay              Int?
+  includeInPayoffPlan Boolean      @default(true)
+  strategy            DebtStrategy @default(MINIMUM_ONLY)
+  notes               String?
+  source              SyncSource   @default(APP)
+  externalId          String?
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+
+  @@unique([name, lender])
+  @@map("debts")
+}
+
+model Goal {
+  id            String    @id @default(cuid())
+  type          GoalType
+  name          String
+  targetAmount  Decimal   @db.Decimal(10, 2)
+  currentAmount Decimal   @default(0) @db.Decimal(10, 2)
+  targetDate    DateTime?
+  notes         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@map("goals")
+}
+
+/// A sandboxed "what if" — never affects real data unless applied.
+model Scenario {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  assumptions Json
+  createdBy   Person
+  appliedAt   DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@map("scenarios")
+}
+
+/// Stub for the future Google Sheets sync (not wired up yet). When a
+/// record differs between the app and the sheet, a conflict is recorded
+/// here instead of either side silently overwriting the other.
+model SyncConflict {
+  id           String   @id @default(cuid())
+  modelName    String
+  recordId     String
+  appVersion   Json
+  sheetVersion Json
+  status       String   @default("REVIEW")
+  createdAt    DateTime @default(now())
+
+  @@map("sync_conflicts")
+}

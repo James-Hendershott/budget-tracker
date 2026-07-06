@@ -1,0 +1,485 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>LEARN.md</title>
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #0e0e10;
+    --surface: #161618;
+    --border: #2a2a2e;
+    --fg: #eaeaea;
+    --muted: #8d8d94;
+    --accent: #6c8cff;
+    --code-bg: #1a1a1d;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; height: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  .shell {
+    display: grid;
+    grid-template-columns: 290px 1fr;
+    min-height: 100vh;
+  }
+  @media (max-width: 900px) {
+    .shell { grid-template-columns: 1fr; }
+    .sidebar { position: static !important; height: auto !important; max-height: none !important; border-right: 0; border-bottom: 1px solid var(--border); }
+  }
+  .sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    max-height: 100vh;
+    overflow-y: auto;
+    padding: 1.5rem 1.25rem 2rem;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    font-size: 0.88rem;
+  }
+  .sidebar h1 { margin: 0 0 0.3rem; font-size: 1.05rem; color: var(--fg); }
+  .sidebar .subtitle { margin: 0 0 1.4rem; font-size: 0.78rem; color: var(--muted); }
+  .sidebar input[type="search"] {
+    width: 100%;
+    padding: 0.4rem 0.55rem;
+    margin-bottom: 0.9rem;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--code-bg);
+    color: var(--fg);
+    font-size: 0.85rem;
+  }
+  .toc { display: flex; flex-direction: column; gap: 0.15rem; }
+  .toc a {
+    color: var(--muted);
+    text-decoration: none;
+    padding: 0.25rem 0.35rem;
+    border-radius: 3px;
+    border-left: 2px solid transparent;
+    transition: background 0.08s, color 0.08s;
+  }
+  .toc a:hover { color: var(--fg); background: rgba(108, 140, 255, 0.08); }
+  .toc a.active { color: var(--fg); border-left-color: var(--accent); background: rgba(108, 140, 255, 0.12); }
+  .toc a.toc-l2 { padding-left: 0.35rem; font-weight: 600; }
+  .toc a.toc-l3 { padding-left: 1rem; font-weight: 400; color: var(--muted); }
+  .toc a.hidden { display: none; }
+
+  .content { padding: 2.5rem 3rem 5rem; max-width: 920px; width: 100%; }
+  @media (max-width: 900px) { .content { padding: 1.5rem 1.25rem 3rem; } }
+
+  h1 { font-size: 1.85rem; line-height: 1.2; margin: 2.5rem 0 0.8rem; }
+  h1:first-child { margin-top: 0; }
+  h2 { font-size: 1.4rem; line-height: 1.25; margin: 2.3rem 0 0.7rem; padding-bottom: 0.35rem; border-bottom: 1px solid var(--border); }
+  h3 { font-size: 1.12rem; line-height: 1.3; margin: 1.7rem 0 0.5rem; }
+  h4 { font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin: 1.3rem 0 0.4rem; }
+  h1, h2, h3, h4 { scroll-margin-top: 1rem; }
+
+  p { margin: 0 0 1rem; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  ul, ol { margin: 0 0 1rem; padding-left: 1.4rem; }
+  ul li, ol li { margin-bottom: 0.25rem; }
+  hr { border: 0; border-top: 1px solid var(--border); margin: 2rem 0; }
+
+  code {
+    font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+    font-size: 0.88em;
+    padding: 0.1em 0.35em;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 0.9rem 1rem;
+    overflow-x: auto;
+    line-height: 1.55;
+    font-size: 0.87rem;
+    margin: 0 0 1rem;
+  }
+  pre code { padding: 0; border: 0; background: transparent; font-size: inherit; }
+
+  blockquote {
+    margin: 0 0 1rem;
+    padding: 0.35rem 1rem;
+    border-left: 3px solid var(--accent);
+    background: rgba(108, 140, 255, 0.06);
+    color: var(--fg);
+  }
+  blockquote p { margin: 0.3rem 0; }
+
+  table { border-collapse: collapse; width: 100%; margin: 0 0 1rem; font-size: 0.9rem; }
+  table th, table td { border: 1px solid var(--border); padding: 0.4rem 0.65rem; text-align: left; vertical-align: top; }
+  table th { background: var(--code-bg); font-weight: 600; }
+  table tr:nth-child(even) td { background: rgba(255, 255, 255, 0.02); }
+
+  strong { color: var(--fg); font-weight: 700; }
+  em { color: #dcdce2; }
+
+  .foot {
+    margin-top: 3rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.78rem;
+  }
+  .foot code { font-size: 0.82rem; }
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar">
+    <h1>LEARN.md</h1>
+    <p class="subtitle">teach-as-you-build wiki</p>
+    <input id="search" type="search" placeholder="Filter sections…" autocomplete="off" />
+    <nav class="toc" id="toc">
+        <a class="toc-l2" href="#table-of-contents">Table of contents</a>
+        <a class="toc-l2" href="#1-understanding-whats-actually-being-asked">1. Understanding what&amp;#39;s actually being asked</a>
+        <a class="toc-l2" href="#2-researching-prior-art">2. Researching prior art</a>
+        <a class="toc-l2" href="#3-architecture-decisions-and-adrs">3. Architecture decisions and ADRs</a>
+        <a class="toc-l2" href="#4-designing-the-data-model">4. Designing the data model</a>
+        <a class="toc-l2" href="#5-building-a-backlog">5. Building a backlog</a>
+        <a class="toc-l2" href="#10-testing-strategy">10. Testing strategy</a>
+        <a class="toc-l2" href="#11-ci-type-checking-linting">11. CI, type checking, linting</a>
+        <a class="toc-l2" href="#12-containers-nginx-deployment">12. Containers, nginx, deployment</a>
+        <a class="toc-l2" href="#13-observability">13. Observability</a>
+        <a class="toc-l2" href="#18-data-model-and-schema-conventions">18. Data model and schema conventions</a>
+        <a class="toc-l2" href="#19-auth-why-its-split-into-two-files">19. Auth: why it&amp;#39;s split into two files</a>
+        <a class="toc-l2" href="#20-server-actions-and-the-validation-boundary">20. Server Actions and the validation boundary</a>
+        <a class="toc-l2" href="#21-the-dashboards-calculation-layer">21. The dashboard&amp;#39;s calculation layer</a>
+    </nav>
+  </aside>
+  <main class="content" id="content">
+    <h1 id="learnmd-the-engineers-companion-to-family-budget-tracker">LEARN.md — The Engineer&#39;s Companion to Family Budget Tracker</h1>
+<p>A teaching document for someone learning to think like a senior software
+engineer, using this codebase as the running case study. Every chapter
+references real decisions made while building the project — the wins,
+the bugs, the things we almost did but talked ourselves out of.</p>
+<blockquote>
+<p><strong>Why this document exists.</strong> Junior engineers often only see the
+finished code. The reasoning, the rejected alternatives, the bugs
+that shaped the design — those usually live only in the heads of
+the people who were there. This document tries to capture them.</p>
+</blockquote>
+<blockquote>
+<p><strong>Companion:</strong> <a href="BUILD_LOG.md"><code>BUILD_LOG.md</code></a> is the chronological
+&quot;what we did and when&quot; — read both. They overlap a little; that&#39;s
+intentional.</p>
+</blockquote>
+<hr>
+<h2 id="table-of-contents">Table of contents</h2>
+<p><strong>Part 1 — The work that happens before any code</strong></p>
+<ol>
+<li>Understanding what&#39;s actually being asked</li>
+<li>Researching prior art</li>
+<li>Architecture decisions and ADRs</li>
+<li>Designing the data model</li>
+<li>Building a backlog</li>
+</ol>
+<p><strong>Part 2 — Writing the code</strong>
+6. Iteration: walking skeleton over perfect first try
+7. Reading errors
+8. Debugging
+9. Refactoring without breaking things</p>
+<p><strong>Part 3 — Shipping it</strong>
+10. Testing strategy
+11. CI, type checking, linting
+12. Containers, nginx, deployment
+13. Observability</p>
+<p><strong>Part 4 — The work that&#39;s actually about other humans</strong>
+14. Asking better questions of stakeholders
+15. Reviewing code
+16. Documenting for the right audience
+17. Agile in practice</p>
+<p><strong>Part 5 — Codebase tour</strong>
+18. Data model and schema conventions
+19. Auth: why it&#39;s split into two files
+20. Server Actions and the validation boundary
+21. The dashboard&#39;s calculation layer</p>
+<p><strong>Appendices</strong></p>
+<ul>
+<li>A. Glossary</li>
+<li>B. ADR template</li>
+<li>C. Recommended reading</li>
+</ul>
+<hr>
+<h1 id="part-1-the-work-that-happens-before-any-code">Part 1 — The work that happens before any code</h1>
+<h2 id="1-understanding-whats-actually-being-asked">1. Understanding what&#39;s actually being asked</h2>
+<p>The literal ask (&quot;build a budget tracker&quot;) is rarely the whole story.
+Here, the surface ask hid a sharper one: James and Savanah didn&#39;t just
+want categories and totals — they wanted to know, on any given day,
+whether they were <em>safe</em>. That reframing is why the dashboard&#39;s job
+statement is a question (&quot;are we okay this month, and safe until the
+next paycheck?&quot;) rather than a feature list. When the ask is vague,
+write down the question the finished thing has to answer before
+writing any code — it disciplines every later decision (what goes on
+the dashboard, what counts as &quot;required,&quot; what the safe-to-spend
+number actually means).</p>
+<h2 id="2-researching-prior-art">2. Researching prior art</h2>
+<p>See <code>BUILD_LOG.md</code> Chapter 0 — the short version is: don&#39;t copy your
+own past decisions by default just because they&#39;re familiar. James
+explicitly asked for current, defensible, professional conventions
+over &quot;what I did on my last project,&quot; which is why every stack choice
+here (Prisma, NextAuth v5, Tailwind v4, Argon2id) is justified on its
+own merits in <code>README.md</code>, not by precedent.</p>
+<h2 id="3-architecture-decisions-and-adrs">3. Architecture decisions and ADRs</h2>
+<p>This project doesn&#39;t have a formal <code>docs/adr/</code> folder yet (small
+enough team — two people — that the reasoning lives in <code>BUILD_LOG.md</code>
+instead). The decisions that would be ADRs if this were a bigger team:</p>
+<ul>
+<li><strong>Prisma over Drizzle/raw SQL</strong> — typed queries, a real migration
+history, and a schema file that&#39;s also documentation, at the cost of
+an extra build step (<code>prisma generate</code>) and a driver-adapter
+indirection (see Chapter 1 in <code>BUILD_LOG.md</code>).</li>
+<li><strong>NextAuth v5 (Credentials + JWT), no adapter</strong> — the Prisma
+adapter (<code>@auth/prisma-adapter</code>) was installed, then <em>removed</em>, once
+it became clear it doesn&#39;t fit this app: the Credentials provider is
+fundamentally incompatible with adapter-driven database sessions
+(Auth.js&#39;s own docs say so), and this app never needed OAuth account
+linking. Installing a dependency and then reading the docs closely
+enough to remove it again is a normal, healthy part of building
+something — better than leaving unused complexity in because it&#39;s
+already there.</li>
+<li><strong>No income/housing/goal seed data</strong>, even though debts were seeded
+with real numbers. The vault&#39;s planning docs simply don&#39;t contain
+real income or rent figures, and guessing them would have put fake
+numbers next to real ones with no way to tell them apart later. When
+you don&#39;t have real data, leave the gap visible — don&#39;t fabricate to
+make a demo look more finished than the underlying information
+actually is.</li>
+</ul>
+<p>If this project grows a team beyond two people, start writing real ADR
+files (template in Appendix B) for decisions like these — the point of
+an ADR isn&#39;t ceremony, it&#39;s making the &quot;why&quot; survive past the memory
+of whoever made the call.</p>
+<h2 id="4-designing-the-data-model">4. Designing the data model</h2>
+<p>Start reading <code>prisma/schema.prisma</code> from the bottom comment on
+<code>Debt</code> — it&#39;s the clearest example in this codebase of a general
+principle: <strong>a required field in a schema is a claim that the data
+always exists.</strong> When you&#39;re modeling something messy and real (one
+family&#39;s actual, incompletely-documented debts), check whether that
+claim is actually true before making a field non-nullable. Two fields
+here (<code>balance</code>, <code>minimumPayment</code>) started required and were changed
+to nullable specifically because the seed data proved the claim false
+— see <code>BUILD_LOG.md</code> Chapter 1, Step 3.</p>
+<p>The <code>BillInstance</code>/<code>RecurringBill</code> split (one template, many monthly
+instances) is a common pattern for &quot;recurring thing that needs
+independent history per occurrence&quot; — look at how <code>prisma/seed.ts</code>
+creates one <code>RecurringBill</code> and then a <code>BillInstance</code> per month, and
+notice that <code>BillInstance.name</code>/<code>category</code>/etc. are <em>copied</em> from the
+template rather than joined at read time. That&#39;s deliberate: if you
+rename a recurring bill next year, this year&#39;s <code>BillInstance</code> rows
+should still show the name they had when the payment happened.</p>
+<h2 id="5-building-a-backlog">5. Building a backlog</h2>
+<p><em>(Stub — TODO when there&#39;s a real backlog/issue tracker to reference
+instead of just the original feature list in the approved plan.)</em></p>
+<hr>
+<h1 id="part-2-writing-the-code">Part 2 — Writing the code</h1>
+<p><em>(Stub for chapters 6–9 — TODO once there&#39;s a debugging story or a
+refactor worth writing up. The Prisma non-interactive-migration
+workaround in <code>BUILD_LOG.md</code> Chapter 1, Step 2 is the closest thing to
+a debugging chapter so far.)</em></p>
+<hr>
+<h1 id="part-3-shipping-it">Part 3 — Shipping it</h1>
+<h2 id="10-testing-strategy">10. Testing strategy</h2>
+<p>Two layers, deliberately not more for an MVP this size:</p>
+<ul>
+<li><strong>Vitest unit tests</strong> (<code>src/lib/calculations/dashboard.test.ts</code>) on
+the pure calculation functions — survival totals, safe-to-spend, and
+debt payoff ordering. These are the functions most likely to have a
+bug that costs real money if wrong, and they&#39;re pure (no database,
+no I/O), so they&#39;re cheap to test exhaustively. Notice the
+<code>sortDebtsForPayoff</code> test deliberately picks APRs and balances that
+<em>disagree</em> with each other (see the comment in the test file) — if
+the avalanche and snowball test fixtures happened to sort into the
+same order, a bug that ignored the <code>strategy</code> parameter entirely
+would still pass both tests.</li>
+<li><strong>One Playwright smoke test</strong> (<code>e2e/login.spec.ts</code>) — login and
+route-protection only. Not a full e2e suite; the point is catching
+&quot;the app doesn&#39;t even start&quot; class failures, not covering every
+flow.</li>
+</ul>
+<p>What&#39;s <em>not</em> tested yet: Server Actions, page rendering, the seed
+script&#39;s data shape. That&#39;s a reasonable gap for an MVP — the plan is
+to add coverage as features solidify, not to block shipping on 100%
+coverage of code that might still change shape.</p>
+<h2 id="11-ci-type-checking-linting">11. CI, type checking, linting</h2>
+<p><code>.github/workflows/ci.yml</code> runs, in order: <code>npm ci</code> (which triggers
+<code>prisma generate</code> via the <code>postinstall</code> script), <code>lint</code>, <code>typecheck</code>,
+<code>test</code>, <code>build</code>. Notice <code>build</code> doesn&#39;t need a live database — every
+page that touches Prisma also calls <code>auth()</code> (reads cookies), which
+Next.js treats as a signal to render dynamically per-request rather
+than at build time. That&#39;s why <code>npm run build</code> worked locally without
+Docker running for part of this session&#39;s testing.</p>
+<h2 id="12-containers-nginx-deployment">12. Containers, nginx, deployment</h2>
+<p><code>docker-compose.yml</code> currently covers <strong>local development only</strong> — a
+single Postgres service. Production/Unraid deployment (a real
+Dockerfile for the Next.js app, a <code>docker-compose.prod.yml</code> overlay,
+reverse proxy config) is an intentional follow-up, not built yet — see
+<code>docs/PLANNING_SOURCES.md</code> and the approved plan for why local-first
+was the right place to stop for this round.</p>
+<h2 id="13-observability">13. Observability</h2>
+<p><em>(Stub — no logging/metrics/error-tracking setup yet. For a
+self-hosted, two-user app, start simple: server logs via <code>docker logs</code>
+are probably sufficient before reaching for anything heavier.)</em></p>
+<hr>
+<h1 id="part-4-the-work-thats-actually-about-other-humans">Part 4 — The work that&#39;s actually about other humans</h1>
+<p><em>(Stub for chapters 14–17 — this project&#39;s &quot;stakeholders&quot; so far are
+James and Savanah directly, so most of this will fill in once there&#39;s
+a real back-and-forth to document — e.g. what Savanah says once she
+starts using Quick Add on her phone.)</em></p>
+<hr>
+<h1 id="part-5-codebase-tour">Part 5 — Codebase tour</h1>
+<h2 id="18-data-model-and-schema-conventions">18. Data model and schema conventions</h2>
+<ul>
+<li>Money is always <code>Decimal</code> (<code>@db.Decimal(10, 2)</code>), never <code>Float</code> —
+floating-point rounding errors are unacceptable when the numbers are
+real dollars. <code>src/lib/decimal.ts</code>&#39;s <code>toNumber()</code> helper is the one
+place Decimal-to-number conversion happens, right at the UI
+boundary — calculations stay on plain numbers (see
+<code>src/lib/calculations/dashboard.ts</code>), Prisma stays on Decimal.</li>
+<li>Every table name is explicitly <code>@@map</code>&#39;d to <code>snake_case</code> (e.g.
+<code>RecurringBill</code> → <code>recurring_bills</code>) — a common convention so the
+Postgres schema reads naturally in <code>psql</code>/<code>prisma studio</code> even
+though the TypeScript side uses PascalCase model names.</li>
+<li><code>source</code>/<code>externalId</code>/<code>updatedAt</code> on every model that could someday
+come from the Google Sheets companion — see
+<code>docs/GOOGLE_SHEETS_COMPANION.md</code> for what these are for. They&#39;re
+unused today; they exist so a future sync feature doesn&#39;t require a
+breaking schema migration on data that already has real history.</li>
+</ul>
+<h2 id="19-auth-why-its-split-into-two-files">19. Auth: why it&#39;s split into two files</h2>
+<p>Read <code>src/auth.config.ts</code> first (small, Edge-safe), then
+<code>src/auth.ts</code> (the real thing, Node-only), then <code>src/middleware.ts</code>
+(imports only the config). The comment at the top of each file
+explains why — see also <code>BUILD_LOG.md</code> Chapter 1, Step 4 for the full
+story of the bug this split prevents.</p>
+<h2 id="20-server-actions-and-the-validation-boundary">20. Server Actions and the validation boundary</h2>
+<p>Every file in <code>src/app/actions/</code> follows the same shape: parse
+<code>FormData</code> through a Zod schema from <code>src/lib/validation/</code>, then call
+Prisma. The Zod schema is the actual security/correctness boundary —
+by the time a Server Action calls <code>prisma.debt.create(...)</code>, the data
+has already been checked. Look at <code>src/app/actions/debtActions.ts</code>
+alongside <code>src/lib/validation/debt.ts</code> to see the pattern end to end,
+including the slightly awkward <code>.toString()</code> calls (Zod validates
+money as a <code>number</code> for form-friendliness; Prisma&#39;s <code>Decimal</code> fields
+want a string or <code>Decimal</code> instance, so the action layer converts at
+the last moment).</p>
+<h2 id="21-the-dashboards-calculation-layer">21. The dashboard&#39;s calculation layer</h2>
+<p><code>src/lib/calculations/dashboard.ts</code> has zero imports from Prisma or
+Next.js on purpose — it only knows about plain objects shaped like
+<code>BillLike</code>/<code>DebtLike</code>. <code>src/app/(app)/page.tsx</code> does the Prisma
+queries and then maps the results into those plain shapes before
+calling the calculation functions. This split is what makes
+<code>dashboard.test.ts</code> possible without a database — the pattern is
+worth reusing anywhere else in this codebase that does real math on
+money.</p>
+<hr>
+<h1 id="appendix-a-glossary">Appendix A: Glossary</h1>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ADR</td>
+<td>Architecture Decision Record. Markdown file documenting one decision, its context, alternatives, and consequences.</td>
+</tr>
+<tr>
+<td><strong>Server Action</strong></td>
+<td>A Next.js function marked <code>&quot;use server&quot;</code> that runs only on the server but can be called directly from a form or client component.</td>
+</tr>
+<tr>
+<td><strong>Server Component</strong></td>
+<td>A React component that renders on the server and can <code>await</code> data directly — the App Router default.</td>
+</tr>
+<tr>
+<td><strong>Driver adapter</strong></td>
+<td>Prisma&#39;s mechanism for plugging in a specific database driver instead of its built-in query engine binary.</td>
+</tr>
+<tr>
+<td><strong>Edge runtime</strong></td>
+<td>The restricted JavaScript runtime Next.js middleware always runs on — no native Node modules.</td>
+</tr>
+</tbody></table>
+<hr>
+<h1 id="appendix-b-adr-template">Appendix B: ADR template</h1>
+<p>Copy into <code>docs/adr/NNN-title.md</code>:</p>
+<pre><code class="language-markdown"># ADR-NNN: [Decision title]
+
+**Date:** YYYY-MM-DD
+**Status:** Proposed | Accepted | Deprecated | Superseded by ADR-XXX
+
+## Context
+What&#39;s the situation that requires a decision?
+
+## Decision
+What did we decide to do?
+
+## Consequences
+What gets better? What gets worse? What new questions arise?
+
+## Alternatives considered
+Bulleted list with one-line reasoning for each.
+</code></pre>
+<hr>
+<h1 id="appendix-c-recommended-reading">Appendix C: Recommended reading</h1>
+<ul>
+<li><em>A Philosophy of Software Design</em> — John Ousterhout</li>
+<li><em>The Pragmatic Programmer</em> — Hunt &amp; Thomas</li>
+<li><em>Refactoring</em> — Martin Fowler</li>
+<li><em>Effective TypeScript</em> — Dan Vanderkam</li>
+<li><em>Staff Engineer</em> — Will Larson</li>
+<li><em>No Silver Bullet</em> — Fred Brooks (free essay online)</li>
+</ul>
+
+    <div class="foot">
+      <code>LEARN.md</code> wiki · 14 sections. Regenerate with <code>npm run build:wiki</code>.
+    </div>
+  </main>
+</div>
+<script>
+  (function () {
+    const search = document.getElementById('search')
+    const tocLinks = Array.from(document.querySelectorAll('#toc a'))
+
+    if (search) {
+      search.addEventListener('input', function () {
+        const q = search.value.trim().toLowerCase()
+        tocLinks.forEach(function (a) {
+          const match = !q || a.textContent.toLowerCase().includes(q)
+          a.classList.toggle('hidden', !match)
+        })
+      })
+    }
+
+    const headingEls = tocLinks
+      .map(function (a) { return document.querySelector(a.getAttribute('href')) })
+      .filter(Boolean)
+
+    function updateActive() {
+      const y = window.scrollY + 80
+      let activeIdx = 0
+      for (let i = 0; i < headingEls.length; i++) {
+        if (headingEls[i].offsetTop <= y) activeIdx = i
+      }
+      tocLinks.forEach(function (a, i) { a.classList.toggle('active', i === activeIdx) })
+    }
+    window.addEventListener('scroll', updateActive, { passive: true })
+    updateActive()
+  })()
+</script>
+</body>
+</html>

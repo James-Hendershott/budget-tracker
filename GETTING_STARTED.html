@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>GETTING_STARTED.md</title>
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #0e0e10;
+    --surface: #161618;
+    --border: #2a2a2e;
+    --fg: #eaeaea;
+    --muted: #8d8d94;
+    --accent: #6c8cff;
+    --code-bg: #1a1a1d;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; height: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  .shell {
+    display: grid;
+    grid-template-columns: 290px 1fr;
+    min-height: 100vh;
+  }
+  @media (max-width: 900px) {
+    .shell { grid-template-columns: 1fr; }
+    .sidebar { position: static !important; height: auto !important; max-height: none !important; border-right: 0; border-bottom: 1px solid var(--border); }
+  }
+  .sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    max-height: 100vh;
+    overflow-y: auto;
+    padding: 1.5rem 1.25rem 2rem;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    font-size: 0.88rem;
+  }
+  .sidebar h1 { margin: 0 0 0.3rem; font-size: 1.05rem; color: var(--fg); }
+  .sidebar .subtitle { margin: 0 0 1.4rem; font-size: 0.78rem; color: var(--muted); }
+  .sidebar input[type="search"] {
+    width: 100%;
+    padding: 0.4rem 0.55rem;
+    margin-bottom: 0.9rem;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--code-bg);
+    color: var(--fg);
+    font-size: 0.85rem;
+  }
+  .toc { display: flex; flex-direction: column; gap: 0.15rem; }
+  .toc a {
+    color: var(--muted);
+    text-decoration: none;
+    padding: 0.25rem 0.35rem;
+    border-radius: 3px;
+    border-left: 2px solid transparent;
+    transition: background 0.08s, color 0.08s;
+  }
+  .toc a:hover { color: var(--fg); background: rgba(108, 140, 255, 0.08); }
+  .toc a.active { color: var(--fg); border-left-color: var(--accent); background: rgba(108, 140, 255, 0.12); }
+  .toc a.toc-l2 { padding-left: 0.35rem; font-weight: 600; }
+  .toc a.toc-l3 { padding-left: 1rem; font-weight: 400; color: var(--muted); }
+  .toc a.hidden { display: none; }
+
+  .content { padding: 2.5rem 3rem 5rem; max-width: 920px; width: 100%; }
+  @media (max-width: 900px) { .content { padding: 1.5rem 1.25rem 3rem; } }
+
+  h1 { font-size: 1.85rem; line-height: 1.2; margin: 2.5rem 0 0.8rem; }
+  h1:first-child { margin-top: 0; }
+  h2 { font-size: 1.4rem; line-height: 1.25; margin: 2.3rem 0 0.7rem; padding-bottom: 0.35rem; border-bottom: 1px solid var(--border); }
+  h3 { font-size: 1.12rem; line-height: 1.3; margin: 1.7rem 0 0.5rem; }
+  h4 { font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin: 1.3rem 0 0.4rem; }
+  h1, h2, h3, h4 { scroll-margin-top: 1rem; }
+
+  p { margin: 0 0 1rem; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  ul, ol { margin: 0 0 1rem; padding-left: 1.4rem; }
+  ul li, ol li { margin-bottom: 0.25rem; }
+  hr { border: 0; border-top: 1px solid var(--border); margin: 2rem 0; }
+
+  code {
+    font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+    font-size: 0.88em;
+    padding: 0.1em 0.35em;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 0.9rem 1rem;
+    overflow-x: auto;
+    line-height: 1.55;
+    font-size: 0.87rem;
+    margin: 0 0 1rem;
+  }
+  pre code { padding: 0; border: 0; background: transparent; font-size: inherit; }
+
+  blockquote {
+    margin: 0 0 1rem;
+    padding: 0.35rem 1rem;
+    border-left: 3px solid var(--accent);
+    background: rgba(108, 140, 255, 0.06);
+    color: var(--fg);
+  }
+  blockquote p { margin: 0.3rem 0; }
+
+  table { border-collapse: collapse; width: 100%; margin: 0 0 1rem; font-size: 0.9rem; }
+  table th, table td { border: 1px solid var(--border); padding: 0.4rem 0.65rem; text-align: left; vertical-align: top; }
+  table th { background: var(--code-bg); font-weight: 600; }
+  table tr:nth-child(even) td { background: rgba(255, 255, 255, 0.02); }
+
+  strong { color: var(--fg); font-weight: 700; }
+  em { color: #dcdce2; }
+
+  .foot {
+    margin-top: 3rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.78rem;
+  }
+  .foot code { font-size: 0.82rem; }
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar">
+    <h1>GETTING_STARTED.md</h1>
+    <p class="subtitle">teach-as-you-build wiki</p>
+    <input id="search" type="search" placeholder="Filter sections…" autocomplete="off" />
+    <nav class="toc" id="toc">
+        <a class="toc-l2" href="#table-of-contents">Table of contents</a>
+        <a class="toc-l2" href="#1-what-you-need-installed">1. What you need installed</a>
+        <a class="toc-l2" href="#2-get-the-code">2. Get the code</a>
+        <a class="toc-l2" href="#3-configure-secrets">3. Configure secrets</a>
+        <a class="toc-l2" href="#4-start-the-database">4. Start the database</a>
+        <a class="toc-l2" href="#5-set-up-the-schema-and-real-data">5. Set up the schema and real data</a>
+        <a class="toc-l2" href="#6-run-the-app">6. Run the app</a>
+        <a class="toc-l2" href="#7-log-in-on-your-pc">7. Log in on your PC</a>
+        <a class="toc-l2" href="#8-use-it-on-your-phone">8. Use it on your phone</a>
+        <a class="toc-l2" href="#9-day-to-day-starting-and-stopping">9. Day-to-day: starting and stopping</a>
+        <a class="toc-l2" href="#10-away-from-home-not-set-up-yet">10. Away from home (not set up yet)</a>
+        <a class="toc-l2" href="#11-troubleshooting">11. Troubleshooting</a>
+    </nav>
+  </aside>
+  <main class="content" id="content">
+    <h1 id="getting_startedmd-zero-to-using-it-on-pc-and-phone">GETTING_STARTED.md — Zero to Using It, on PC and Phone</h1>
+<p>A walkthrough for getting Family Budget Tracker running from a
+completely fresh machine, all the way to using it day-to-day on both
+your computer and your phone. If you just want the command list with
+no explanation, see the &quot;Quick start&quot; section in
+<a href="README.md"><code>README.md</code></a> instead — this document is the slower,
+explain-everything version.</p>
+<blockquote>
+<p>This file, <code>LEARN.md</code>, and <code>BUILD_LOG.md</code> are automatically mirrored
+into the Obsidian planning vault
+(<code>D:\James_Journey\projects\active\budget-tracker</code>) every time Claude
+Code edits them here, via a local <code>PostToolUse</code> hook — see
+<code>.claude/settings.local.json</code>. Edit the copy in this repo, not the
+vault copy; the vault copy gets overwritten.</p>
+</blockquote>
+<hr>
+<h2 id="table-of-contents">Table of contents</h2>
+<ol>
+<li><a href="#1-what-you-need-installed">What you need installed</a></li>
+<li><a href="#2-get-the-code">Get the code</a></li>
+<li><a href="#3-configure-secrets">Configure secrets</a></li>
+<li><a href="#4-start-the-database">Start the database</a></li>
+<li><a href="#5-set-up-the-schema-and-real-data">Set up the schema and real data</a></li>
+<li><a href="#6-run-the-app">Run the app</a></li>
+<li><a href="#7-log-in-on-your-pc">Log in on your PC</a></li>
+<li><a href="#8-use-it-on-your-phone">Use it on your phone</a></li>
+<li><a href="#9-day-to-day-starting-and-stopping">Day-to-day: starting and stopping</a></li>
+<li><a href="#10-away-from-home-not-set-up-yet">Away from home (not set up yet)</a></li>
+<li><a href="#11-troubleshooting">Troubleshooting</a></li>
+</ol>
+<hr>
+<h2 id="1-what-you-need-installed">1. What you need installed</h2>
+<p>Only on the computer you develop/run the server from (your phone
+needs nothing installed — it just uses a web browser):</p>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Why</th>
+<th>Check you have it</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><a href="https://nodejs.org">Node.js</a> 20+</td>
+<td>Runs the app</td>
+<td><code>node -v</code></td>
+</tr>
+<tr>
+<td><a href="https://www.docker.com/products/docker-desktop/">Docker Desktop</a></td>
+<td>Runs the Postgres database in a container</td>
+<td><code>docker --version</code></td>
+</tr>
+<tr>
+<td><a href="https://git-scm.com/">Git</a></td>
+<td>Gets the code, tracks changes</td>
+<td><code>git --version</code></td>
+</tr>
+</tbody></table>
+<p>Docker Desktop specifically needs to be <strong>running</strong> (not just
+installed) — it has its own app icon, and you&#39;ll see it in your system
+tray when it&#39;s up. Start it before step 4.</p>
+<h2 id="2-get-the-code">2. Get the code</h2>
+<p>The repo is private on GitHub at
+<code>https://github.com/James-Hendershott/budget-tracker</code>. Clone it:</p>
+<pre><code class="language-bash">git clone https://github.com/James-Hendershott/budget-tracker.git
+cd budget-tracker
+npm install
+</code></pre>
+<p><code>npm install</code> also runs <code>prisma generate</code> automatically afterward
+(via a <code>postinstall</code> script) — that&#39;s expected, not an error.</p>
+<h2 id="3-configure-secrets">3. Configure secrets</h2>
+<pre><code class="language-bash">cp .env.example .env
+</code></pre>
+<p>Open <code>.env</code> and check it looks like this (the defaults already match
+<code>docker-compose.yml</code>, so you likely don&#39;t need to change
+<code>DATABASE_URL</code>/<code>SHADOW_DATABASE_URL</code>):</p>
+<pre><code>DATABASE_URL=&quot;postgresql://budget_tracker:budget_tracker_dev@localhost:5432/budget_tracker?schema=public&quot;
+SHADOW_DATABASE_URL=&quot;postgresql://budget_tracker:budget_tracker_dev@localhost:5432/budget_tracker_shadow?schema=public&quot;
+AUTH_SECRET=&quot;replace-with-a-generated-secret&quot;
+NEXTAUTH_URL=&quot;http://localhost:3000&quot;
+</code></pre>
+<p>Generate a real <code>AUTH_SECRET</code> (don&#39;t ship the placeholder) — pick
+whichever of these you have available:</p>
+<pre><code class="language-bash">openssl rand -base64 32
+# or, if you don&#39;t have openssl:
+node -e &quot;console.log(require(&#39;crypto&#39;).randomBytes(32).toString(&#39;base64&#39;))&quot;
+</code></pre>
+<p>Paste the output in as <code>AUTH_SECRET</code>. <code>.env</code> is gitignored — it never
+gets committed, even though the repo itself is private.</p>
+<h2 id="4-start-the-database">4. Start the database</h2>
+<pre><code class="language-bash">docker compose up -d
+</code></pre>
+<p>This starts a single Postgres container (<code>db</code>) with a persistent
+Docker volume, so your data survives restarts. First run downloads the
+Postgres image (~100MB), so it can take a minute. Confirm it&#39;s healthy:</p>
+<pre><code class="language-bash">docker compose ps
+</code></pre>
+<p>You should see <code>db</code> with status <code>Up</code> / <code>healthy</code>.</p>
+<h2 id="5-set-up-the-schema-and-real-data">5. Set up the schema and real data</h2>
+<pre><code class="language-bash">npm run db:migrate:deploy   # creates all the tables
+npm run db:seed             # seeds real household debts + two accounts
+</code></pre>
+<p>The seed script prints the two accounts&#39; passwords to the terminal
+<strong>the first time it creates them</strong> — copy those down immediately, they
+won&#39;t be shown again (re-running the seed later won&#39;t reprint them,
+since it won&#39;t touch existing passwords). If you ever need to reset a
+password, do it via <code>/admin/users</code> once logged in, or reseed with
+<code>SEED_JAMES_PASSWORD=... SEED_SAVANAH_PASSWORD=... npm run db:seed</code>
+against a fresh database.</p>
+<h2 id="6-run-the-app">6. Run the app</h2>
+<pre><code class="language-bash">npm run dev
+</code></pre>
+<p>Leave this running in its own terminal window — it&#39;s the server.
+You&#39;ll see <code>Ready in ...</code> and a <code>Local: http://localhost:3000</code> line
+once it&#39;s up.</p>
+<h2 id="7-log-in-on-your-pc">7. Log in on your PC</h2>
+<p>Open <code>http://localhost:3000</code> in a browser. You&#39;ll land on <code>/login</code>.
+Sign in with one of the two accounts from step 5. You should land on
+the dashboard, showing this month&#39;s required bills, debts, and a
+&quot;safe to spend&quot; number computed from the real seeded debt data.</p>
+<h2 id="8-use-it-on-your-phone">8. Use it on your phone</h2>
+<p>Two things need to be true for your phone to reach the app: your
+phone needs to be <strong>on the same Wi-Fi network</strong> as the computer
+running <code>npm run dev</code> (this is a local-network-only setup for now —
+see <a href="#10-away-from-home-not-set-up-yet">section 10</a> for the away-from-home plan), and you need
+the computer&#39;s <strong>local network IP address</strong>, not <code>localhost</code> (which
+only means &quot;this device&quot; — your phone can&#39;t use it to reach your PC).</p>
+<p><strong>Find your PC&#39;s local IP:</strong></p>
+<ul>
+<li><strong>Windows:</strong> open a terminal and run <code>ipconfig</code>, look for
+&quot;IPv4 Address&quot; under your active adapter (usually &quot;Wi-Fi&quot;).</li>
+<li><strong>Mac:</strong> System Settings → Wi-Fi → Details → IP Address (or
+<code>ipconfig getifaddr en0</code> in Terminal).</li>
+</ul>
+<p>It&#39;ll look like <code>192.168.1.XX</code>.</p>
+<p><strong>On your phone</strong>, open a browser and go to:</p>
+<pre><code>http://192.168.1.XX:3000
+</code></pre>
+<p>(using your actual IP from above). You should see the same login page.</p>
+<p><strong>Install it as an app (PWA)</strong> so it behaves like a native app —
+home-screen icon, full-screen, no browser chrome:</p>
+<ul>
+<li><strong>iPhone (Safari):</strong> open the site → tap the Share icon (square with
+an arrow) → <strong>Add to Home Screen</strong> → confirm.</li>
+<li><strong>Android (Chrome):</strong> open the site → tap the <strong>⋮</strong> menu → <strong>Add to
+Home screen</strong> / <strong>Install app</strong> → confirm.</li>
+</ul>
+<p>Once installed, launching it from the home screen icon works exactly
+like any other app, including a shortcut straight to Quick Add (long-press
+the icon on most phones to see it) for logging a transaction fast.</p>
+<blockquote>
+<p>Your PC needs to stay on and <code>npm run dev</code> needs to stay running for
+your phone to reach it this way — this is a development setup, not a
+deployed server. See the next section for always-on access.</p>
+</blockquote>
+<h2 id="9-day-to-day-starting-and-stopping">9. Day-to-day: starting and stopping</h2>
+<p>To pick back up on a new day:</p>
+<pre><code class="language-bash">docker compose up -d   # if the database container isn&#39;t already running
+npm run dev
+</code></pre>
+<p>To stop for the day: <code>Ctrl+C</code> in the <code>npm run dev</code> terminal. The
+database container can keep running in the background (<code>docker compose ps</code> to check) — no need to stop it between sessions, and your
+data stays put either way since it&#39;s on a persistent volume.</p>
+<h2 id="10-away-from-home-not-set-up-yet">10. Away from home (not set up yet)</h2>
+<p>Right now the app only works when your phone is on the same Wi-Fi as
+the PC running it. Making it reachable from anywhere — your phone on
+cellular data, from work, etc. — needs a real deployment, which is an
+explicit next step, not done yet:</p>
+<ul>
+<li>Package the app into a Docker container (a production <code>Dockerfile</code>)
+and run it continuously on your Unraid server instead of a laptop
+that has to stay awake.</li>
+<li>Reach it privately from anywhere via <strong>Tailscale</strong> (already
+installed on this machine, per the original plan) rather than
+exposing it to the public internet.</li>
+</ul>
+<p>Ask to pick this up whenever you&#39;re ready — it&#39;s tracked as a known
+follow-up in <code>docs/PLANNING_SOURCES.md</code> and <code>README.md</code>.</p>
+<h2 id="11-troubleshooting">11. Troubleshooting</h2>
+<p><strong><code>docker compose up -d</code> fails / hangs.</strong> Docker Desktop isn&#39;t
+running — open it from the Start menu and wait for the whale icon in
+your system tray to stop animating, then retry.</p>
+<p><strong><code>npm run db:migrate:deploy</code> or <code>db:seed</code> can&#39;t connect.</strong> The
+database container probably isn&#39;t up yet, or isn&#39;t healthy. Run
+<code>docker compose ps</code> — if <code>db</code> isn&#39;t listed as healthy, run <code>docker compose logs db</code> to see why.</p>
+<p><strong>Your phone can&#39;t reach <code>http://192.168.1.XX:3000</code>.</strong> Almost always
+one of: phone isn&#39;t actually on the same Wi-Fi network (not just the
+same building — some networks separate &quot;guest&quot; and &quot;main&quot; Wi-Fi, which
+blocks this); Windows Firewall is blocking incoming connections to
+port 3000 (allow Node.js through the firewall when prompted, or check
+Windows Defender Firewall settings); or the PC&#39;s IP changed since you
+last checked (re-run <code>ipconfig</code>).</p>
+<p><strong>You forgot a password.</strong> There&#39;s no self-service &quot;forgot password&quot;
+flow yet (a private 2-person app doesn&#39;t need one via email). Reset it
+directly: <code>SEED_JAMES_PASSWORD=NewPassword123 npm run db:seed</code> will
+only work if the user doesn&#39;t already exist — for an existing user,
+reset via Prisma Studio (<code>npm run db:studio</code>) is the current path
+until an in-app reset flow exists: generate a new Argon2id hash and
+update the <code>users</code> table&#39;s <code>passwordHash</code> column by hand, or delete
+the user row and reseed.</p>
+<p><strong>Something else broke.</strong> Check the terminal running <code>npm run dev</code> for
+an error — Next.js error messages usually point at the exact file and
+line. If it&#39;s a database schema issue, <code>npm run db:studio</code> opens a
+GUI you can poke around in to see the actual data.</p>
+
+    <div class="foot">
+      <code>GETTING_STARTED.md</code> wiki · 12 sections. Regenerate with <code>npm run build:wiki</code>.
+    </div>
+  </main>
+</div>
+<script>
+  (function () {
+    const search = document.getElementById('search')
+    const tocLinks = Array.from(document.querySelectorAll('#toc a'))
+
+    if (search) {
+      search.addEventListener('input', function () {
+        const q = search.value.trim().toLowerCase()
+        tocLinks.forEach(function (a) {
+          const match = !q || a.textContent.toLowerCase().includes(q)
+          a.classList.toggle('hidden', !match)
+        })
+      })
+    }
+
+    const headingEls = tocLinks
+      .map(function (a) { return document.querySelector(a.getAttribute('href')) })
+      .filter(Boolean)
+
+    function updateActive() {
+      const y = window.scrollY + 80
+      let activeIdx = 0
+      for (let i = 0; i < headingEls.length; i++) {
+        if (headingEls[i].offsetTop <= y) activeIdx = i
+      }
+      tocLinks.forEach(function (a, i) { a.classList.toggle('active', i === activeIdx) })
+    }
+    window.addEventListener('scroll', updateActive, { passive: true })
+    updateActive()
+  })()
+</script>
+</body>
+</html>

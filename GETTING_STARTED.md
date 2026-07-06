@@ -22,7 +22,7 @@ explain-everything version.
 2. [Get the code](#2-get-the-code)
 3. [Configure secrets](#3-configure-secrets)
 4. [Start the database](#4-start-the-database)
-5. [Set up the schema and real data](#5-set-up-the-schema-and-real-data)
+5. [Set up the schema and demo data](#5-set-up-the-schema-and-demo-data)
 6. [Run the app](#6-run-the-app)
 7. [Log in on your PC](#7-log-in-on-your-pc)
 8. [Use it on your phone](#8-use-it-on-your-phone)
@@ -106,11 +106,11 @@ docker compose ps
 
 You should see `db` with status `Up` / `healthy`.
 
-## 5. Set up the schema and real data
+## 5. Set up the schema and demo data
 
 ```bash
 npm run db:migrate:deploy   # creates all the tables
-npm run db:seed             # seeds real household debts + two accounts
+npm run db:seed             # seeds demo debts + two accounts
 ```
 
 The seed script prints the two accounts' passwords to the terminal

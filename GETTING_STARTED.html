@@ -148,7 +148,7 @@
         <a class="toc-l2" href="#2-get-the-code">2. Get the code</a>
         <a class="toc-l2" href="#3-configure-secrets">3. Configure secrets</a>
         <a class="toc-l2" href="#4-start-the-database">4. Start the database</a>
-        <a class="toc-l2" href="#5-set-up-the-schema-and-real-data">5. Set up the schema and real data</a>
+        <a class="toc-l2" href="#5-set-up-the-schema-and-demo-data">5. Set up the schema and demo data</a>
         <a class="toc-l2" href="#6-run-the-app">6. Run the app</a>
         <a class="toc-l2" href="#7-log-in-on-your-pc">7. Log in on your PC</a>
         <a class="toc-l2" href="#8-use-it-on-your-phone">8. Use it on your phone</a>
@@ -180,7 +180,7 @@ vault copy; the vault copy gets overwritten.</p>
 <li><a href="#2-get-the-code">Get the code</a></li>
 <li><a href="#3-configure-secrets">Configure secrets</a></li>
 <li><a href="#4-start-the-database">Start the database</a></li>
-<li><a href="#5-set-up-the-schema-and-real-data">Set up the schema and real data</a></li>
+<li><a href="#5-set-up-the-schema-and-demo-data">Set up the schema and demo data</a></li>
 <li><a href="#6-run-the-app">Run the app</a></li>
 <li><a href="#7-log-in-on-your-pc">Log in on your PC</a></li>
 <li><a href="#8-use-it-on-your-phone">Use it on your phone</a></li>
@@ -256,9 +256,9 @@ Postgres image (~100MB), so it can take a minute. Confirm it&#39;s healthy:</p>
 <pre><code class="language-bash">docker compose ps
 </code></pre>
 <p>You should see <code>db</code> with status <code>Up</code> / <code>healthy</code>.</p>
-<h2 id="5-set-up-the-schema-and-real-data">5. Set up the schema and real data</h2>
+<h2 id="5-set-up-the-schema-and-demo-data">5. Set up the schema and demo data</h2>
 <pre><code class="language-bash">npm run db:migrate:deploy   # creates all the tables
-npm run db:seed             # seeds real household debts + two accounts
+npm run db:seed             # seeds demo debts + two accounts
 </code></pre>
 <p>The seed script prints the two accounts&#39; passwords to the terminal
 <strong>the first time it creates them</strong> — copy those down immediately, they

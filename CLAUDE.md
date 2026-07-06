@@ -18,7 +18,7 @@ npm run test:e2e           # Playwright smoke test — needs a running server + 
 
 npm run db:migrate        # create + apply a migration (interactive — will fail in non-TTY shells, see below)
 npm run db:migrate:deploy # apply existing migrations, non-interactive-safe
-npm run db:seed           # seed real household data from the vault (see prisma/seed.ts)
+npm run db:seed           # seed fictional demo data shaped like the vault's real tracker (see prisma/seed.ts)
 npm run db:studio         # Prisma Studio GUI
 npm run db:generate       # regenerate the Prisma client after schema.prisma changes
 

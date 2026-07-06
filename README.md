@@ -6,8 +6,8 @@ and safe until the next paycheck?"*
 
 Requirements come from a real household's debt/consolidation planning
 notes (see [`docs/PLANNING_SOURCES.md`](docs/PLANNING_SOURCES.md)),
-and the dev database is seeded with the real numbers so the dashboard
-means something from day one — see
+and the dev database is seeded with fictional demo data shaped the
+same way so the dashboard means something from day one — see
 [`BUILD_LOG.md`](BUILD_LOG.md) for the full story of how this was
 built, and [`LEARN.md`](LEARN.md) for the reasoning behind the stack
 choices below.
@@ -24,7 +24,7 @@ npm install                # installs deps, then runs `prisma generate` via post
 cp .env.example .env       # fill in AUTH_SECRET (openssl rand -base64 32)
 docker compose up -d       # starts local Postgres
 npm run db:migrate:deploy  # apply migrations
-npm run db:seed            # seed real household data + two accounts (prints temp passwords)
+npm run db:seed            # seed demo data + two accounts (prints temp passwords)
 npm run dev                # http://localhost:3000
 ```
 
@@ -70,7 +70,7 @@ src/
   generated/prisma/        # generated Prisma client (gitignored)
 prisma/
   schema.prisma
-  seed.ts                  # seeds real household debt data from the vault
+  seed.ts                  # seeds fictional demo debt data, shaped like the vault's real tracker
   migrations/
 docs/
   PLANNING_SOURCES.md

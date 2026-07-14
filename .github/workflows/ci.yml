@@ -23,4 +23,9 @@ jobs:
       - run: npm run lint
       - run: npm run typecheck
       - run: npm run test
+
       - run: npm run build
+        env:
+          DATABASE_URL: postgresql://ci:ci@localhost:5432/ci?schema=public
+          AUTH_SECRET: ci-only-placeholder-secret-not-used-anywhere-real
+          NEXTAUTH_URL: http://localhost:3000
